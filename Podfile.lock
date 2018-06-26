@@ -1,0 +1,29 @@
+PODS:
+  - Bolts/Tasks (1.9.0)
+  - HaishinKit (0.9.0):
+    - Logboard (~> 1.1.6)
+  - Logboard (1.1.6)
+  - Parse (1.17.1):
+    - Parse/Core (= 1.17.1)
+  - Parse/Core (1.17.1):
+    - Bolts/Tasks (~> 1.9)
+  - SnapKit (4.0.0)
+  - SwiftDate (4.5.1)
+
+DEPENDENCIES:
+  - HaishinKit (~> 0.9.0)
+  - Parse
+  - SnapKit (~> 4.0.0)
+  - SwiftDate
+
+SPEC CHECKSUMS:
+  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
+  HaishinKit: 301b0572f140094e9ee6dc5fb79c0701a7ec131e
+  Logboard: 5a0df1bb3bf1a4f505170c26beb124a2a00ecad3
+  Parse: d3edaf8c7c722cb33cb83ba7821d015ae32d362d
+  SnapKit: a42d492c16e80209130a3379f73596c3454b7694
+  SwiftDate: 7b56d42a221f582047287deb256b23fc5ed49a60
+
+PODFILE CHECKSUM: 6511d86615d863f92796032ee25bd33782113af9
+
+COCOAPODS: 1.3.1
