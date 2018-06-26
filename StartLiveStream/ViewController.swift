@@ -64,6 +64,8 @@ class ViewController: UIViewController {
       make.centerX.equalToSuperview()
       make.top.equalTo(titleLabel.snp.bottom).offset(30)
     }
+    
+    self.update()
   }
   
   func update() {
@@ -75,7 +77,7 @@ class ViewController: UIViewController {
       
       guard let stream = objs?.last, let startsAt = stream["startsAt"] as? Date else {
         self.titleLabel.text = "There are no live streams currently scheduled. Please check back later."
-        self.startButton.isHidden = false
+        self.startButton.isHidden = true
         return
       }
       
