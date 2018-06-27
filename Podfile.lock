@@ -8,12 +8,14 @@ PODS:
   - Parse/Core (1.17.1):
     - Bolts/Tasks (~> 1.9)
   - SnapKit (4.0.0)
+  - SVProgressHUD (2.2.5)
   - SwiftDate (4.5.1)
 
 DEPENDENCIES:
   - HaishinKit (~> 0.9.0)
   - Parse
   - SnapKit (~> 4.0.0)
+  - SVProgressHUD
   - SwiftDate
 
 SPEC REPOS:
@@ -23,6 +25,7 @@ SPEC REPOS:
     - Logboard
     - Parse
     - SnapKit
+    - SVProgressHUD
     - SwiftDate
 
 SPEC CHECKSUMS:
@@ -31,8 +34,9 @@ SPEC CHECKSUMS:
   Logboard: 5a0df1bb3bf1a4f505170c26beb124a2a00ecad3
   Parse: d3edaf8c7c722cb33cb83ba7821d015ae32d362d
   SnapKit: a42d492c16e80209130a3379f73596c3454b7694
+  SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftDate: 7b56d42a221f582047287deb256b23fc5ed49a60
 
-PODFILE CHECKSUM: 6511d86615d863f92796032ee25bd33782113af9
+PODFILE CHECKSUM: c902607433b14916e08dad5811f8fbf311e64052
 
 COCOAPODS: 1.5.3

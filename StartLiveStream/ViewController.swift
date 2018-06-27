@@ -16,6 +16,7 @@ import Parse
 // communicates with backend server
 import SwiftDate
 // gets dates in readable format
+import SVProgressHUD
 
 class ViewController: UIViewController {
   
@@ -23,7 +24,7 @@ class ViewController: UIViewController {
     let view = UILabel()
     view.numberOfLines = 0
     view.textAlignment = .center
-    view.text = "There are no live streams currently scheduled. Please check back later."
+    view.text = "Check with server...hold on"
     return view
   }()
   
@@ -43,6 +44,8 @@ class ViewController: UIViewController {
   var stream: PFObject?
   
   let session: AVAudioSession = AVAudioSession.sharedInstance()
+  
+  var hkView: UIView?
 
   
   override func viewDidLoad() {
@@ -55,7 +58,7 @@ class ViewController: UIViewController {
       self.update()
     })
     
-    startButton.addTarget(self, action: #selector(self.initializeStream), for: .touchUpInside)
+    startButton.addTarget(self, action: #selector(self.auth), for: .touchUpInside)
     
     view.addSubview(titleLabel)
     titleLabel.snp.makeConstraints { (make) in
@@ -112,6 +115,34 @@ class ViewController: UIViewController {
 
   }
   
+  @objc func auth() {
+    let alert = UIAlertController(title: "Passcode", message: "Please specify the passcode to initiate livestream", preferredStyle: UIAlertControllerStyle.alert)
+    let action = UIAlertAction(title: "Go", style: .default) { (alertAction) in
+      let textField = alert.textFields![0] as UITextField
+      
+      guard let text = textField.text, let passcode = self.stream?["passcode"] as? String, text == passcode else {
+        SVProgressHUD.showError(withStatus: "Wrong passcode.")
+        return
+      }
+      
+      SVProgressHUD.showSuccess(withStatus: "Awesome")
+      
+      self.initializeStream()
+    }
+    
+    
+    alert.addTextField { (textField) in
+      textField.placeholder = "Passcode"
+      textField.isSecureTextEntry = true
+    }
+    
+    alert.addAction(action)
+    
+    present(alert, animated: true, completion: nil)
+
+
+  }
+  
   @objc func initializeStream() {
     guard let stream = stream else { return }
     
@@ -131,6 +162,21 @@ class ViewController: UIViewController {
     let rtmpConnection:RTMPConnection = RTMPConnection()
     
     let rtmpStream: RTMPStream = RTMPStream(connection: rtmpConnection)
+    
+    rtmpStream.captureSettings = [
+      "fps": 30, // FPS
+      "sessionPreset": AVCaptureSession.Preset.medium, // input video width/height
+      "continuousAutofocus": false, // use camera autofocus mode
+      "continuousExposure": false, //  use camera exposure mode
+    ]
+    
+    rtmpStream.videoSettings = [
+      "width": 640, // video output width
+      "height": 360, // video output height
+      "bitrate": 160 * 1024, // video output bitrate
+      // "dataRateLimits": [160 * 1024 / 8, 1], optional kVTCompressionPropertyKey_DataRateLimits property
+      "maxKeyFrameIntervalDuration": 2, // key frame / sec
+    ]
     
     rtmpStream.attachAudio(AVCaptureDevice.default(for: .audio)) { error in
       // print(error)
@@ -153,6 +199,41 @@ class ViewController: UIViewController {
     
       rtmpConnection.connect(stream["streamURL"] as? String ?? "")
       rtmpStream.publish(stream["streamKey"] as? String ?? "")
+    
+    
+    
+    let liveLabel = UILabel()
+    liveLabel.backgroundColor = .green
+    liveLabel.textColor = .white
+    liveLabel.text = "  LIVE  "
+    liveLabel.layer.cornerRadius = 3
+    liveLabel.layer.masksToBounds = true
+
+    
+    hkView.addSubview(liveLabel)
+    liveLabel.snp.makeConstraints { (make) in
+      make.left.top.equalToSuperview().offset(20)
+    }
+    
+    self.hkView = hkView
+    
+    
+    
+    let hangupButton = UIButton(type: .system)
+    hangupButton.setImage(UIImage(named: "hangup"), for: .normal)
+    hangupButton.tintColor = .red
+    
+    hkView.addSubview(hangupButton)
+    hangupButton.snp.makeConstraints { (make) in
+      make.bottom.right.equalToSuperview().offset(-20)
+    }
+    
+    hangupButton.addTarget(self, action: #selector(self.hangup), for: .touchUpInside)
+    
+  }
+  
+  @objc func hangup() {
+    hkView?.removeFromSuperview()
   }
   
   

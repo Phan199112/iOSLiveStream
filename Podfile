@@ -10,4 +10,5 @@ target 'StartLiveStream' do
   pod 'SnapKit', '~> 4.0.0'
   pod 'Parse'
   pod 'SwiftDate'
+  pod 'SVProgressHUD'
 end
