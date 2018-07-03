@@ -1,4 +1,5 @@
 PODS:
+  - Alamofire (4.7.2)
   - Bolts/Tasks (1.9.0)
   - HaishinKit (0.9.0):
     - Logboard (~> 1.1.6)
@@ -12,6 +13,7 @@ PODS:
   - SwiftDate (4.5.1)
 
 DEPENDENCIES:
+  - Alamofire (~> 4.7)
   - HaishinKit (~> 0.9.0)
   - Parse
   - SnapKit (~> 4.0.0)
@@ -20,6 +22,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - Alamofire
     - Bolts
     - HaishinKit
     - Logboard
@@ -29,6 +32,7 @@ SPEC REPOS:
     - SwiftDate
 
 SPEC CHECKSUMS:
+  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   HaishinKit: 301b0572f140094e9ee6dc5fb79c0701a7ec131e
   Logboard: 5a0df1bb3bf1a4f505170c26beb124a2a00ecad3
@@ -37,6 +41,6 @@ SPEC CHECKSUMS:
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftDate: 7b56d42a221f582047287deb256b23fc5ed49a60
 
-PODFILE CHECKSUM: c902607433b14916e08dad5811f8fbf311e64052
+PODFILE CHECKSUM: b0e190f8fff29f94846db1e9f7563f61765b1dde
 
 COCOAPODS: 1.5.3

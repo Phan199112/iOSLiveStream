@@ -6,6 +6,7 @@
 //  Copyright © 2018 Aziz. All rights reserved.
 //
 
+
 import UIKit
 import HaishinKit
 // ^^ this is the streaming library that streams and manages RTMP session/grabs video/audio frames from camera and passes it on to YouTube's server
@@ -17,8 +18,20 @@ import Parse
 import SwiftDate
 // gets dates in readable format
 import SVProgressHUD
+import Alamofire
+
+extension UITextView {
+  func simple_scrollToBottom() {
+    let textCount: Int = text.count
+    guard textCount >= 1 else { return }
+    scrollRangeToVisible(NSMakeRange(textCount - 1, 1))
+  }
+}
+
 
 class ViewController: UIViewController {
+  let API_KEY = "AIzaSyDY2FaAt00BAe_Qsh4n2VKPdGImbXAuxNY"
+  
   
   let titleLabel: UILabel = {
     let view = UILabel()
@@ -27,6 +40,16 @@ class ViewController: UIViewController {
     view.text = "Check with server...hold on"
     return view
   }()
+  
+  let textView: UITextView = {
+    let view = UITextView()
+    view.backgroundColor = .clear
+    view.textColor = .white
+    view.isSelectable = false
+    return view
+  }()
+  
+  var messages = [String]()
   
   let startButton: UIButton = {
     let button = UIButton(type: .system)
@@ -46,7 +69,9 @@ class ViewController: UIViewController {
   let session: AVAudioSession = AVAudioSession.sharedInstance()
   
   var hkView: UIView?
-
+  var rtmpStream: RTMPStream?
+  var rtmpConnection: RTMPConnection?
+  
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -76,8 +101,30 @@ class ViewController: UIViewController {
     self.update()
   }
   
-
+  func getComments() {
+    guard hkView?.superview != nil else { print("returning"); return }
+    
+    
+    Alamofire.request("https://www.googleapis.com/youtube/v3/liveChat/messages?liveChatId=EiEKGFVDU1VhR3BfcjRNN3ZJLTZCc250OTh4ZxIFL2xpdmU&part=snippet&key=AIzaSyDY2FaAt00BAe_Qsh4n2VKPdGImbXAuxNY", method: .get).responseJSON { (resp) in
+      
+      guard let resp = resp.value as? [String:Any],
+        let items = resp["items"] as? [[String:Any]] else {
+          print("uh oh ")
+          return
+      }
+      
+      self.messages = items.map { ($0["snippet"] as? [String: Any])?["displayMessage"] as? String ?? ":("}
+      let text = self.messages.reduce("") { (res, msg) in
+        return "\(res)\n\(msg)\n"
+      }
+      self.textView.text = text
+      self.textView.simple_scrollToBottom()
+    }
+  }
+  
+  
   func update() {
+    getComments()
     // queries the stream table in parse (only table that matters!)
     let query = PFQuery(className:"Stream")
     // checks to see if endsat is greater than now
@@ -89,7 +136,7 @@ class ViewController: UIViewController {
     // makes it so latest stream is first and cuts off remaining
     query.limit = 1
     query.findObjectsInBackground { (objs, error) in
-        
+      
       // checks if there is a current stream
       guard let stream = objs?.last, let startsAt = stream["startsAt"] as? Date else {
         self.titleLabel.text = "There are no live streams currently scheduled. Please check back later."
@@ -98,8 +145,8 @@ class ViewController: UIViewController {
       }
       
       self.stream = stream
-        
-//      this sets the time before the stream where the "start streaming" button appears
+      
+      //      this sets the time before the stream where the "start streaming" button appears
       if ((Date() + 15.minutes) < startsAt) {
         self.titleLabel.text = "Next scheduled livestream is \(startsAt.colloquialSinceNow() ?? "")\nAbout 15 minutes before the stream starts, you will be able to start streaming.\nWe'll send you a push notification."
         self.startButton.isHidden = true
@@ -112,7 +159,7 @@ class ViewController: UIViewController {
       }
       
     }
-
+    
   }
   
   @objc func auth() {
@@ -139,8 +186,8 @@ class ViewController: UIViewController {
     alert.addAction(action)
     
     present(alert, animated: true, completion: nil)
-
-
+    
+    
   }
   
   @objc func initializeStream() {
@@ -148,7 +195,7 @@ class ViewController: UIViewController {
     
     // audio quality so that it doesn't kill user's data; video is default
     do {
-        // preferred sample rate is how many times in a sample it samples the audio; higher means better audio
+      // preferred sample rate is how many times in a sample it samples the audio; higher means better audio
       try session.setPreferredSampleRate(44_100)
       try session.setCategory(AVAudioSessionCategoryPlayAndRecord, with: .allowBluetooth)
       try session.setMode(AVAudioSessionModeDefault)
@@ -171,8 +218,8 @@ class ViewController: UIViewController {
     ]
     
     rtmpStream.videoSettings = [
-      "width": 640, // video output width
-      "height": 360, // video output height
+      "width": 360, // video output width
+      "height": 640, // video output height
       "bitrate": 160 * 1024, // video output bitrate
       // "dataRateLimits": [160 * 1024 / 8, 1], optional kVTCompressionPropertyKey_DataRateLimits property
       "maxKeyFrameIntervalDuration": 2, // key frame / sec
@@ -189,16 +236,17 @@ class ViewController: UIViewController {
     hkView.videoGravity = AVLayerVideoGravity.resizeAspectFill
     hkView.attachStream(rtmpStream)
     
+    
     // add ViewController#view
     view.addSubview(hkView)
     
     // HARD CODED
     //    rtmpConnection.connect("rtmp://live-yto.twitch.tv/app/live_216028934_JUtjWUzoIjEbjev25FC8s3Y9Dcdt7H")
-//    rtmpConnection.connect("rtmp://a.rtmp.youtube.com/live2")
-//    rtmpStream.publish("20p6-zu7z-rxjf-5ur8")
+    //    rtmpConnection.connect("rtmp://a.rtmp.youtube.com/live2")
+    //    rtmpStream.publish("20p6-zu7z-rxjf-5ur8")
     
-      rtmpConnection.connect(stream["streamURL"] as? String ?? "")
-      rtmpStream.publish(stream["streamKey"] as? String ?? "")
+    rtmpConnection.connect(stream["streamURL"] as? String ?? "")
+    rtmpStream.publish(stream["streamKey"] as? String ?? "")
     
     
     
@@ -208,14 +256,23 @@ class ViewController: UIViewController {
     liveLabel.text = "  LIVE  "
     liveLabel.layer.cornerRadius = 3
     liveLabel.layer.masksToBounds = true
-
+    
     
     hkView.addSubview(liveLabel)
     liveLabel.snp.makeConstraints { (make) in
       make.left.top.equalToSuperview().offset(20)
     }
     
+    hkView.addSubview(textView)
+    textView.snp.makeConstraints {
+      $0.left.bottom.equalToSuperview()
+      $0.right.equalToSuperview().multipliedBy(0.5)
+      $0.height.equalToSuperview().multipliedBy(0.4)
+    }
+    
     self.hkView = hkView
+    self.rtmpConnection = rtmpConnection
+    self.rtmpStream = rtmpStream
     
     
     
@@ -233,7 +290,16 @@ class ViewController: UIViewController {
   }
   
   @objc func hangup() {
-    hkView?.removeFromSuperview()
+    
+    SVProgressHUD.show(withStatus: "Hold Up")
+    
+    Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { (_) in
+      self.rtmpConnection?.close()
+      self.hkView?.removeFromSuperview()
+      self.textView.removeFromSuperview()
+      
+      SVProgressHUD.dismiss()
+    }
   }
   
   

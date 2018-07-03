@@ -11,4 +11,5 @@ target 'StartLiveStream' do
   pod 'Parse'
   pod 'SwiftDate'
   pod 'SVProgressHUD'
+  pod 'Alamofire', '~> 4.7'
 end
