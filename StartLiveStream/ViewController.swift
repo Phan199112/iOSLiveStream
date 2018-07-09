@@ -32,12 +32,14 @@ extension UITextView {
 class ViewController: UIViewController {
   let API_KEY = "AIzaSyDY2FaAt00BAe_Qsh4n2VKPdGImbXAuxNY"
   
-  
+  // set font of comments
   let titleLabel: UILabel = {
     let view = UILabel()
     view.numberOfLines = 0
     view.textAlignment = .center
     view.text = "Check with server...hold on"
+    
+    
     return view
   }()
   

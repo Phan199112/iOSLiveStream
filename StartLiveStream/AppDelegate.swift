@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
 
   
-  let serverURL = "http://ec2-18-191-197-111.us-east-2.compute.amazonaws.com:1337/parse"
+  let serverURL = "http://ec2-18-220-194-44.us-east-2.compute.amazonaws.com:1337/parse"
   let appID = "dreamstream"
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
